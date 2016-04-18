@@ -8,15 +8,36 @@
 
 namespace utils;
 
-
 class utils
 {
+    protected $dbhost;
+    protected $dbuser;
+    protected $dbpass;
+    protected $dbname;
+
+    public function __construct()
+    {
+        $this->dbuser = "localhost";
+        $this->dbuser = "ab_admin";
+        $this->dbpass = "ab_pass";
+        $this->dbname = "licenze";
+
+    }
+
     public static function checkConnessione(){
         if (!$sock = @fsockopen('www.google.com', 80, $num, $error, 5))
             return 'OFFLINE';
         else
             return 'ONLINE';
     }
+
+    public function connect()
+    {
+
+        $this->conn = @mysql_connect($this->dbhost, $this->dbuser, $this->dbpass) or die ("parametri di connessione errati: " . mysql_error());
+        mysql_select_db($this->dbname, $this->conn) or die("Errore nella selezione del db: " . mysql_error());
+    }
+
     public static function renderData($dati, $output){
         //echo __FUNCTION__;
         //var_dump($data);
@@ -100,10 +121,12 @@ class utils
         }
         echo "</pre><br />";
     }
+
     public static function redirect($toUrl=""){
         header("Location: ".$toUrl);
     }
     public static function SessioneCasuale($chars=16){
+       // echo __FUNCTION__;
         $Stringa = "";
         for($I=0;$I<$chars;$I++){
             do{
@@ -207,7 +230,7 @@ class utils
         $q_select .= " $limit\n";
 //stampe di controllo
         if ($debugmode) utils::trace("<br />$funzione q:<br />". $q_select . "<br/><br />", __FILE__, __LINE__,__FUNCTION__);
-        $r_select=  mysql_query($q_select) or die(_MSG_ERRORE_FATALE_1_ .":<br />Funzione:". __FUNCTION__ . "<br />Linea:" . __LINE__ ."<br />File:". __FILE__ ."<br />QUERY:<br />" .$q_select . "<br /><br />Errore:<br />". mysql_error());
+        $r_select=  mysql_query($q_select) or die("Errore:<br />Funzione:". __FUNCTION__ . "<br />Linea:" . __LINE__ ."<br />File:". __FILE__ ."<br />QUERY:<br />" .$q_select . "<br /><br />Errore:<br />". mysql_error());
         if( $num_record != -1 ) $num_record = mysql_num_rows($r_select);
         if (!is_array($dati)){
             return $r_select;
