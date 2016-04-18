@@ -20,3 +20,13 @@ Servizi:
   NU è uguale
   Se Attivo è == SI → Log­in OK
   Se Attivo è == NO → ERRORE
+
+- 18.04.16 :: FEATURE
+Le feature si utilizzano chiamando in stringa il parametro feature con il nome della feature e i parametri annessi
+- generaCodici[NA] = genera [NA] codici
+- eliminaLicenza[NL] = elimina la licenza specificata
+- checkLicenza [NL] = restituisce i dati associati a quella licenza
+- attivaLicenza [NL] = attiva la licenza impostando il parametro attivo a 1
+- disattivaLicenza [NL] = disattiva la licenza impostando il parametro attivo a -1
+- incrementaLicenza [NL, NA] = incrementa il numero di attivazioni massime [NAMAX] della licenza [NL]
+
