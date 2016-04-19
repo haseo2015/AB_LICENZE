@@ -34,6 +34,9 @@ class login
 
         if (!empty($this->feature)) {
             switch($this->feature){
+                case "doLogin":
+                    $this->doLogin($this->licenza,$this->user);
+                break;
                 case "generaCodici":
                     login::generaCodici($this->numeroAttivazioni);
                 break;
@@ -55,11 +58,11 @@ class login
             }
         }
 
-        if (!empty($this->licenza) AND !empty($this->user)) {
+        /*if (!empty($this->licenza) AND !empty($this->user)) {
             $this->doLogin($this->licenza,$this->user);
         } else {
             login::loginForm();
-        }
+        }*/
 
         //$this->doLogin($this->licenza,$this->user);
     }

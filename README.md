@@ -30,3 +30,7 @@ Le feature si utilizzano chiamando in stringa il parametro feature con il nome d
 - disattivaLicenza [NL] = disattiva la licenza impostando il parametro attivo a -1
 - incrementaLicenza [NL, NA] = incrementa il numero di attivazioni massime [NAMAX] della licenza [NL]
 
+- 19.04.16 :: INSTALLAZIONE
+- basta richiamare/includere la classe login per farla funzionare. In caso di necessità di index, creare file index e
+includere la classe login.
+- aggiunto servizio di login: ?feature=doLogin [NU, NL]
