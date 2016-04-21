@@ -34,3 +34,7 @@ Le feature si utilizzano chiamando in stringa il parametro feature con il nome d
 - basta richiamare/includere la classe login per farla funzionare. In caso di necessità di index, creare file index e
 includere la classe login.
 - aggiunto servizio di login: ?feature=doLogin [NU, NL]
+
+- 21.04.16 :: AGGIORNAMENTO
+- aggiunta feature registrazione nome chiamata doRegister
+- migliorata la classe login con aggiunta parametri per registrazione
