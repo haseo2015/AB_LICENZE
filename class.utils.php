@@ -14,13 +14,15 @@ class utils
     protected $dbuser;
     protected $dbpass;
     protected $dbname;
+    public $conn;
 
     public function __construct()
     {
-        $this->dbuser = "localhost";
+        $this->dbhost = "localhost";
         $this->dbuser = "ab_admin";
         $this->dbpass = "ab_pass";
         $this->dbname = "licenze";
+        $this->conn = "";
 
     }
 
@@ -34,8 +36,15 @@ class utils
     public function connect()
     {
 
+        /*echo "CPMMM<br>";
+        echo $this->dbhost."<br>";
+        echo $this->dbuser."<br>";
+        echo $this->dbpass."<br>";*/
         $this->conn = @mysql_connect($this->dbhost, $this->dbuser, $this->dbpass) or die ("parametri di connessione errati: " . mysql_error());
+
+
         mysql_select_db($this->dbname, $this->conn) or die("Errore nella selezione del db: " . mysql_error());
+        //cho "aaaaaaa";
     }
 
     public static function renderData($dati, $output){

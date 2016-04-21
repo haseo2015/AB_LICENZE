@@ -22,8 +22,10 @@ class login
 
     function __construct()
     {
+
         $u = new utils();
         $u->connect();
+        
         $this->licenza = (isset($_REQUEST['NL'])) ? $u->anti_injection($_REQUEST['NL']) : null;
         $this->user = (isset($_REQUEST['NU'])) ? $u->anti_injection($_REQUEST['NU']) : null;
         $this->numeroAttivazioni = (isset($_REQUEST['NA'])) ? $u->anti_injection($_REQUEST['NA']) : null;
@@ -34,9 +36,15 @@ class login
 
         if (!empty($this->feature)) {
             switch($this->feature){
-                case "doLogin":
-                    $this->doLogin($this->licenza,$this->user);
+                default:
+                    echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><errore>Feature non riconosciuta</errore>";
                 break;
+                case "doLogin":
+                    $this->doLogin($this->licenza,$this->user,'l');
+                break;
+                case "doRegister":
+                    $this->doLogin($this->licenza,$this->user,'r');
+                    break;
                 case "generaCodici":
                     login::generaCodici($this->numeroAttivazioni);
                 break;
@@ -76,38 +84,52 @@ class login
         echo $html;
     }
 
-    public function doLogin($licenza,$user){
-       // echo __CLASS__ . "/" . __FUNCTION__;
+    public function doLogin($licenza,$user,$mode="l"){
+        //echo __CLASS__ . "/" . __FUNCTION__;
+        $_dati = array();
         $dati = array();
+        $ut = array();
         $numrec = 0;
-       utils::SelectTabelle("ab_licenze",array("*"),"where NL = '" . $licenza . "' AND attivo > 0 AND NU= '". $user ."'", null, null,$numrec,$dati);
-        //utils::trace($dati);
-        // caso 0 dati -> inserisco
-        if (count($dati) == 0){
-            $ut = array();
+        // controllo preventivo sul codice licenza. Se il codice è sbagliato esco.
+        utils::SelectTabelle("ab_licenze",array("*"),"where NL = '" . $licenza . "'", null, null,$numrec,$_dati);
+        if (count($_dati) == 0){
+            echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><errore>Licenza errata</errore>";
+            return;
+        }
+        // se il codice è giusto proseguo con il tentativo di login
+        utils::SelectTabelle("ab_licenze",array("*"),"where NL = '" . $licenza . "' AND attivo > 0 AND NU= '". $user ."'", null, null,$numrec,$dati);
+        if (count($dati) === 0){
             // controllo che non ci sia già un altro username
             utils::SelectTabelle("ab_licenze",array("NU"),"where attivo > 0 AND NL = '" . $licenza . "'", null, null,$numrec,$ut);
-            //var_dump( empty($ut[0]["attivo"]) > 0 );
             if (count($ut) > 0){
-                if (empty($ut[0]["NU"])){
+                // se trovo un nome utente Errore
+                echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><errore>Licenza già assegnata</errore>";
+            } else {
+                // se NON trovo un nome utente lo assegno ed effettuo la registrazione
+                if (empty($ut[0]["NU"]) && $mode='r'){
                     utils::UpdateTabella("ab_licenze", array("NU" => $user, "NA" => 1, "attivo" => 1),"NL = '".$licenza."'");
                     echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><messaggio>codice assegnato</messaggio>";
-                } else {
-                    echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><errore>codice già assegnato</errore>";
                 }
-            } else {
-                echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><errore>Licenza disattivata</errore>";
             }
-
         } else {
-
-            if ($dati[0]["NA"] < $dati[0]["NAMAX"]){
+        // ho trovato un utente, controllo il numero di licenze
+            if ($dati[0]["NA"] <= $dati[0]["NAMAX"]){
                 if($dati[0]["attivo"] > 0){
-                    utils::UpdateTabella("ab_licenze", array("NU" => $user, "NA" => $dati[0]["NA"]+1),"NL = '".$licenza."'");
-                    echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><messaggio>login OK</messaggio>";
+                    if ($mode == 'r'){
+                        utils::UpdateTabella("ab_licenze", array("NU" => $user, "NA" => $dati[0]["NA"]+1),"NL = '".$licenza."'");
+                        echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><messaggio>Licenza registrata</messaggio>";
+                    } else {
+                        echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><messaggio>login OK</messaggio>";
+                    }
+                } else {
+                    echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><errore>Licenza disattivata</errore>";
                 }
             } else {
-                echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><errore>Limite licenze raggiunto</errore>";
+                if ($mode == 'r') {
+                    echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><errore>Limite licenze raggiunto</errore>";
+                }else{
+                    echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><errore>Login errata</errore>";
+                }
             }
         }
 
